@@ -1,35 +1,22 @@
 import { Box, HStack } from "styled-system/jsx";
 
 import { NextLink } from "@/components/Link/NextLink";
-import { type VFileData, frontMatterKeys } from "@/features/remark/frontmatter";
+import type { VFileData } from "@/features/remark/frontmatter";
 import { Link } from "@/park-ui/components/link";
-import { stringToDate, toYYYYMMDD } from "@/utils/date";
+import { toYYYYMMDD } from "@/utils/date";
 import { PenIcon, RotateCwIcon } from "lucide-react";
+import { getFileDate } from "./util";
 
 export const FrontMatter = ({
 	frontmatter,
 }: Pick<VFileData, "frontmatter">) => {
-	const createdString = frontmatter?.[frontMatterKeys.created.key];
-	const createdDateMaybe = createdString
-		? stringToDate(String(createdString))
-		: null;
-	const updatedString = frontmatter?.[frontMatterKeys.updated.key];
-	const updatedDateMaybe = updatedString
-		? stringToDate(String(updatedString))
-		: null;
+	const fileDate = getFileDate({ frontmatter });
+	if (!fileDate) return null;
 
-	const createdDateYMD =
-		createdDateMaybe || updatedDateMaybe
-			? toYYYYMMDD((createdDateMaybe || updatedDateMaybe) as Date)
-			: undefined;
-	const updateDateYMD =
-		createdDateMaybe || updatedDateMaybe
-			? toYYYYMMDD((createdDateMaybe || updatedDateMaybe) as Date)
-			: undefined;
+	const { created, updated } = fileDate;
 
-	if (!createdDateYMD && !updateDateYMD) {
-		return null;
-	}
+	const createdDateYMD = toYYYYMMDD((created || updated) as Date);
+	const updateDateYMD = toYYYYMMDD((created || updated) as Date);
 
 	return (
 		<HStack justifyContent={"end"} fontSize={"0.8em"}>
